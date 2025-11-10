@@ -1,0 +1,47 @@
+// TypeScript configuration - tells TypeScript how to compile our code
+{
+  "compilerOptions": {
+    // Target ES2022 JavaScript (modern JavaScript features)
+    "target": "ES2022",
+    
+    // Use CommonJS module system (standard for Node.js)
+    "module": "commonjs",
+    
+    // Include ES2022 standard library
+    // "dom" for browser APIs (like document, window) e.g node.nodeType === Node.TEXT_NODE
+    "lib": ["ES2022", "dom"],
+    
+    // Output compiled JavaScript to ./dist folder
+    "outDir": "./dist",
+    
+    // Source TypeScript files are in ./src folder
+    "rootDir": "./src",
+    
+    // Enable all strict type-checking options (catch more errors)
+    "strict": true,
+    
+    // Allow importing CommonJS modules as ES6 modules
+    "esModuleInterop": true,
+    
+    // Skip type checking of declaration files (faster compilation)
+    "skipLibCheck": true,
+    
+    // Ensure consistent casing in file names
+    "forceConsistentCasingInFileNames": true,
+    
+    // Allow importing JSON files
+    "resolveJsonModule": true,
+    
+    // Type definitions to include
+    "types": ["node", "@types/node"],
+    
+    // How to resolve module imports
+    "moduleResolution": "node"
+  },
+  
+  // Include all TypeScript files in src folder
+  "include": ["src/**/*", "src/utils/env-utils.ts"],
+  
+  // Don't compile node_modules
+  "exclude": ["node_modules"]
+}

@@ -1,0 +1,28 @@
+# Node
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# TypeScript
+dist/
+build/
+*.tsbuildinfo
+
+# Playwright / Test artifacts
+test-reports/
+
+# Coverage
+coverage/
+.nyc_output/
+coverage-final.json
+
+# OS files
+.DS_Store
+Thumbs.db
+

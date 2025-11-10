@@ -1,0 +1,33 @@
+{
+  "name": "pw_bdd_prex",
+  "version": "1.0.0",
+  "description": "Test automation framework with Playwright, Cucumber, and TypeScript",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rimraf reports/ && rimraf test-reports/",
+    "suite": "npm run clean && cucumber-js",
+    "test:parallel": "npm run clean && cucumber-js --parallel 3",
+    "test:smoke": "npm run clean && cucumber-js --tags @smoke",
+    "test:login": "npm run clean && cucumber-js --tags @login",
+    "test:pricing": "npm run clean && cucumber-js --tags @pricing",
+    "test:tag": "npm run clean && cucumber-js --tags",
+    "report": "node src/reports/generate-report.js",
+    "test": "npm run suite; npm run report"
+  },
+  "dependencies": {
+    "@cucumber/cucumber": "^12.2.0",
+    "@playwright/test": "^1.56.1",
+    "dotenv": "^17.2.3",
+    "multiple-cucumber-html-reporter": "^3.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "rimraf": "^6.1.0",
+    "strip-ansi": "^7.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
