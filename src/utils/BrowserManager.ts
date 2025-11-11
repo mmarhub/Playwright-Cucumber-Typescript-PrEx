@@ -101,10 +101,10 @@ export class BrowserManager {
     });
 
     // Start tracing (records screenshots and snapshots for debugging)
-    await this.context.tracing.start({
-      screenshots: true,   // Capture screenshots during test
-      snapshots: true      // Capture DOM snapshots
-    });
+    // await this.context.tracing.start({
+    //   screenshots: true,   // Capture screenshots during test
+    //   snapshots: true      // Capture DOM snapshots
+    // });
   }
 
   /**

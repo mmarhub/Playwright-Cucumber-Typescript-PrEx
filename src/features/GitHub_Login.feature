@@ -23,14 +23,15 @@ Feature: GitHub User Login Functionality
 
   # Background runs before EACH scenario in this feature
   # Use it for common setup steps
-  Background:
-    #Given the user is on the login page
-    Given Open the browser and start "github" application
+  # Background:
+  #Given the user is on the login page
+  # Given Open the browser and start "github" application
 
   # Tags: @smoke = run in smoke test suite, @login = login-related tests
   # Run with: npm run test:tags "@smoke"
   @positive @login
   Scenario: Successful login with valid credentials
+    Given Open the browser and start "github" application
     When I click on Sign in link
     And I enter username "positive@test.com"
     And I enter password "password123"
@@ -40,6 +41,7 @@ Feature: GitHub User Login Functionality
   # @negative = negative test case (testing failure scenarios)
   @negative @login
   Scenario: Failed login with invalid credentials
+    Given Open the browser and start "github" application
     When I click on Sign in link
     And I enter username "negative@test.com"
     And I enter password "password123"
@@ -50,6 +52,7 @@ Feature: GitHub User Login Functionality
   # Runs multiple times with different data from Examples table
   @negative @login @wip
   Scenario Outline: Login with multiple invalid credentials
+    Given Open the browser and start "github" application
     When I click on Sign in link
     When the user logs in with username "<username>" and password "<password>"
     Then the user should see an error message
@@ -60,3 +63,11 @@ Feature: GitHub User Login Functionality
       | emptyuser@test.com | emptypass | Incorrect username or password.        |
       | wronguser@test.com | wrongpass | Incorrect username or password. - fail |
 
+  @switchtab
+  Scenario: Open Discord tab and verify then return to main tab and verify Community
+    Given I open the webpage "https://playwright.dev/"
+    When I click the Discord icon and navigate to the new tab
+    And I verify the title contains "Discord"
+    And I close the new tab and switch back to the main tab
+    When I click the "Community" menu link
+    Then I verify the text "Welcome" is visible on the page

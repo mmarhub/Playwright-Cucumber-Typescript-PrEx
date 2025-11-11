@@ -241,3 +241,34 @@ Then('I should see error message {string}',
     expect(errorMessage).toContain(expectedMessage);
   });
 
+Given('I open the webpage {string}',
+  async function (this: CustomWorld, url: string) {
+    await this.loginPage.navigateToCustomUrl(url);
+  });
+
+When('I click the Discord icon and navigate to the new tab',
+  async function (this: CustomWorld) {
+    await this.loginPage.clickDiscordIcon();
+  });
+
+When('I verify the title contains {string}',
+  async function (this: CustomWorld, expectedTitle: string) {
+    expect(await this.loginPage.isDiscordHomePageVisible()).toBeTruthy();
+  });
+
+When('I close the new tab and switch back to the main tab',
+  async function (this: CustomWorld) {
+    await this.loginPage.closeChildTabAndSwitchBackToParentTab();
+  });
+
+When('I click the {string} menu link',
+  async function (this: CustomWorld, menuLink: string) {
+    await this.loginPage.clickCommunityMenu();
+  });
+
+Then('I verify the text {string} is visible on the page',
+  async function (this: CustomWorld, expectedText: string) {
+    const actualText = await this.loginPage.getPWWelcomeText();
+    expect(actualText).toContain(expectedText);
+  });
+

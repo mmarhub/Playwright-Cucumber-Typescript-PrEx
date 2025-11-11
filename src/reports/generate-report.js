@@ -71,6 +71,6 @@ report.generate({
 
 console.log('═══════════════════════════════════════════════════');
 console.log('✅ HTML Report generated successfully!');
-console.log('📂 Location: reports/html-report/index.html');
+console.log('📂 Location: test-reports/html-report/index.html');
 console.log('═══════════════════════════════════════════════════');
-// Report will be in: reports/html-report/index.html
+// Report will be in: test-reports/html-report/index.html

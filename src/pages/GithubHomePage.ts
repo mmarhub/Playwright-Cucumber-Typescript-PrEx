@@ -10,29 +10,28 @@ import { BasePage } from './BasePage';
 import { BrowserManager } from '../utils/BrowserManager';
 
 export class GithubHomePage extends BasePage {
-  // Pricing page element locators
-  private readonly pricingLink: Locator;
-  private readonly pricingTitle: Locator;
-  private readonly welcomeMessage: Locator;
-  private readonly logoutButton: Locator;
-  private readonly userProfile: Locator;
-
+  // Pricing page element selectors
+  private readonly pricingLink: string;
+  private readonly pricingTitle: string;
+  private readonly welcomeMessage: string;
+  private readonly logoutButton: string;
+  private readonly userProfile: string;
   /**
    * Constructor
    * 
-   * Initializes pricing page locators
+   * Initializes pricing page selectors
    * 
    * @param browserManager - BrowserManager instance
    */
   constructor(browserManager: BrowserManager) {
     super(browserManager);
     
-    // Initialize locators for home pricing elements
-    this.pricingLink = this.page.locator('//nav[@aria-label="Global"]//span[contains(text(),"Pricing")]');
-    this.pricingTitle = this.page.locator('//h1[@class="h2-mktg"]');
-    this.welcomeMessage = this.page.locator('//div[contains(@class, "welcome-message")]');
-    this.logoutButton = this.page.locator('//summary[@aria-label="View profile and more"]');
-    this.userProfile = this.page.locator('//img[@alt="@username"]'); // Example user profile image locator
+    // Initialize selectors for home pricing elements
+    this.pricingLink = '//nav[@aria-label="Global"]//span[contains(text(),"Pricing")]';
+    this.pricingTitle = '//h1[@class="h2-mktg"]';
+    this.welcomeMessage = '//div[contains(@class, "welcome-message")]';
+    this.logoutButton = '//summary[@aria-label="View profile and more"]';
+    this.userProfile = '//img[@alt="@username"]'; // Example user profile image locator
   }
 
   /**
@@ -44,7 +43,7 @@ export class GithubHomePage extends BasePage {
    */
   async clickPricingLink(): Promise<void> {
     // how can we know which run thread is executing this code?
-    await this.clickElement(this.pricingLink);
+    await this.click(this.pricingLink);
   }
 
   /**
@@ -56,7 +55,7 @@ export class GithubHomePage extends BasePage {
    * @returns Pricing title text
    */
   async getPricingTitle(): Promise<string> {
-    return await this.getText(this.pricingTitle);
+    return await this.getTextContent(this.pricingTitle);
   }
 
   /**
@@ -68,7 +67,7 @@ export class GithubHomePage extends BasePage {
    * @returns Welcome message text
    */
   async getWelcomeMessage(): Promise<string> {
-    return await this.getText(this.welcomeMessage);
+    return await this.getTextContent(this.welcomeMessage);
   }
 
   /**
@@ -79,7 +78,7 @@ export class GithubHomePage extends BasePage {
    * @returns true if visible, false otherwise
    */
   async isWelcomeMessageDisplayed(): Promise<boolean> {
-    return await this.isElementVisible(this.welcomeMessage);
+    return await this.isElementVisibleBySelector(this.welcomeMessage);
   }
 
   /**
@@ -88,7 +87,7 @@ export class GithubHomePage extends BasePage {
    * Clicks the logout button to sign out
    */
   async clickLogout(): Promise<void> {
-    await this.clickElement(this.logoutButton);
+    await this.click(this.logoutButton);
   }
 
   /**
@@ -99,6 +98,6 @@ export class GithubHomePage extends BasePage {
    * @returns true if logged in, false otherwise
    */
   async isLoggedIn(): Promise<boolean> {
-    return await this.isElementVisible(this.userProfile);
+    return await this.isElementVisibleBySelector(this.userProfile);
   }
 }

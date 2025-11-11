@@ -36,9 +36,13 @@ export abstract class BasePage {
   //   this.baseUrl = config.baseUrl;
   // }
   constructor(browserManager: BrowserManager) {
-    this.browserManager = browserManager;
+    this.browserManager = browserManager!;
     this.page = browserManager.getPage()!;
     this.baseUrl = config.baseUrl;
+  }
+
+  async getBrowserManager(): Promise<BrowserManager | undefined> {
+    return this.browserManager;
   }
 
   /**
@@ -55,6 +59,10 @@ export abstract class BasePage {
     await this.page.goto(`${this.baseUrl}${path}`);
     //await this.browserManager?.getPage()?.bringToFront();
     //await this.browserManager?.getContext()?.pages().at(0)?.bringToFront();
+  }
+
+  async navigateToCustomUrl(url: string): Promise<void> {
+    await this.page.goto(url);
   }
 
   /**
@@ -98,6 +106,12 @@ export abstract class BasePage {
     await locator.click();
   }
 
+  // Click Element by Selector
+  async click(selector: string): Promise<void> {
+    await this.waitForElementVisibleBySelector(selector);
+    await this.page.locator(selector).click();
+  }
+
   /**
    * Fill Input Field
    * 
@@ -116,6 +130,11 @@ export abstract class BasePage {
     await locator.fill(text);
   }
 
+  // Fill Input Field by Selector
+  async fill(selector: string, text: string): Promise<void> {
+    await this.waitForElementVisibleBySelector(selector);
+    await this.page.locator(selector).fill(text);
+  }
   /**
    * Get Text from Element
    * 
@@ -131,6 +150,12 @@ export abstract class BasePage {
     // Get text content, return empty string if null
     // The '|| ""' is a fallback in case textContent returns null
     return await locator.textContent() || '';
+  }
+
+  // Get Text Content by Selector
+  async getTextContent(selector: string): Promise<string> {
+    await this.waitForElementVisibleBySelector(selector);
+    return await this.page.locator(selector).textContent() || '';
   }
 
   /**
@@ -157,6 +182,18 @@ export abstract class BasePage {
     }
   }
 
+  // Check if Element is Visible by Selector
+  async isElementVisibleBySelector(selector: string): Promise<boolean> {
+    try {
+      await this.page.locator(selector).waitFor(
+        { state: 'visible', timeout: 5000 }
+      );
+      return true;  // Element is visible
+    } catch {
+      return false;
+    }
+  }
+
   /**
    * Take Screenshot
    * 
@@ -171,10 +208,73 @@ export abstract class BasePage {
   async takeScreenshot(name: string): Promise<void> {
     await this.page.screenshot({
       // Template literal creates unique filename with timestamp
-      path: `reports/screenshots/${name}-${Date.now()}.png`,
+      path: `test-reports/screenshots/${name}-${Date.now()}.png`,
 
       // Capture entire page (not just visible viewport)
       fullPage: true
     });
   }
+
+  // Wait for Element Visible by Locator
+  async waitForElementVisibleByLocator(locator: Locator, timeout: number = 10000): Promise<void> {
+    await locator.waitFor({ state: 'visible', timeout: timeout });
+  }
+
+  // Wait for Element Visible by Selector
+  async waitForElementVisibleBySelector(selector: string, timeout: number = 10000): Promise<void> {
+    await this.page.locator(selector).waitFor({ state: 'visible', timeout: timeout });
+  }
+
+  // Click Element by Selector and Switch to New Tab
+  async clickAndSwitchToNewTab(selector: string): Promise<void> {
+    // Listen for new page (tab) event
+    console.log(`before - this.page: ${this.page.url()}`);
+    const [newPage] = await Promise.all([
+      this.page.context().waitForEvent('page'),
+      this.page.locator(selector).click() // Click the element that opens new tab
+    ]);
+
+    // Bring the new tab to the front (focus)
+    await newPage?.bringToFront();
+
+    // Update the current page reference to the new tab
+    this.page = newPage;
+  }
+
+  // Close Child Tab and Switch Back to Parent Tab
+  async closeChildTabAndSwitchBackToParentTab(): Promise<void> {
+
+    const currentPage = this.page;
+    await currentPage.close();
+
+    // Assuming the parent page is the first page in the context
+    const pages = this.page.context().pages();
+    const parentPage = pages[0];
+
+    // Bring the parent tab to the front (focus)
+    await parentPage.bringToFront();
+
+    // Update the current page reference to the parent tab
+    this.page = parentPage;
+  }
+
+  // async closeNewTabAndSwitchBack(): Promise<void> {
+
+  //   const pages = this.page.context().pages();
+  //   if (pages.length < 2) {
+  //     throw new Error('No child tab to close.');
+  //   }
+
+  //   const parentPage = pages[0];
+  //   const childPage = pages[pages.length - 1];
+
+  //   // Close the child tab
+  //   await childPage.close();
+
+  //   // Switch back to the parent tab
+  //   await parentPage.bringToFront();
+
+  //   // Update the current page reference to the parent tab
+  //   this.page = parentPage;
+  // }
 }

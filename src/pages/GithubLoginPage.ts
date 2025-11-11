@@ -16,19 +16,23 @@ import { BasePage } from './BasePage';
 import { BrowserManager } from '../utils/BrowserManager';
 
 export class GithubLoginPage extends BasePage {
-  // Private locators: Element references on the page
+  // Private selectors: Element references on the page
   // 'readonly' means they can't be reassigned after initialization
-  private readonly usernameInput: Locator;
-  private readonly passwordInput: Locator;
-  private readonly loginButton: Locator;
-  private readonly errorMessage: Locator;
-  private readonly signInButton: Locator;
+  private readonly usernameInput: string;
+  private readonly passwordInput: string;
+  private readonly loginButton: string;
+  private readonly errorMessage: string;
+  private readonly signInButton: string;
+  private readonly pwDiscordIcon: string;
+  private readonly discordSiteHomeIcon: string;
+  private readonly communityMenuLink: string;
+  private readonly pwWelcomeTitle: string;
 
   /**
    * Constructor
    * 
-   * Initializes all locators for elements on the login page
-   * Locators are not actual elements - they're references that are resolved when used
+   * Initializes all selectors for elements on the login page
+   * Selectors are not actual elements - they're references that are resolved when used
    * 
    * @param browserManager - BrowserManager instance
    */
@@ -36,13 +40,17 @@ export class GithubLoginPage extends BasePage {
     // Call parent BasePage constructor
     super(browserManager);
 
-    // Initialize locators using CSS selectors
+    // Initialize selectors using CSS selectors
     // '#' selects by ID, '.' selects by class, direct tag name, or attributes, '//' for XPath
-    this.usernameInput = this.page.locator('input[name="login"]');
-    this.passwordInput = this.page.locator('input[name="password"]');
-    this.loginButton = this.page.locator('input[name="commit"]');
-    this.errorMessage = this.page.locator('div[id="js-flash-container"] div[role="alert"]');
-    this.signInButton = this.page.locator('//div[contains(@class, "HeaderMenu-link-wrap")]//a[@href="/login"]');
+    this.usernameInput = 'input[name="login"]';
+    this.passwordInput = 'input[name="password"]';
+    this.loginButton = 'input[name="commit"]';
+    this.errorMessage = 'div[id="js-flash-container"] div[role="alert"]';
+    this.signInButton = '//div[contains(@class, "HeaderMenu-link-wrap")]//a[@href="/login"]';
+    this.pwDiscordIcon = 'a[aria-label="Discord server"]';
+    this.discordSiteHomeIcon = '//header[contains(@class, "wrapperDesktop")]//a[contains(@class, "logoLink")]';
+    this.communityMenuLink = '//a[contains(text(), "Community")]';
+    this.pwWelcomeTitle = 'article header h1';
   }
 
   /**
@@ -54,7 +62,7 @@ export class GithubLoginPage extends BasePage {
   async navigateToLoginPage(): Promise<void> {
     // Call parent's navigate method with '/login' path
     await this.navigate('/login');
-    
+
     // Wait for page to fully load
     await this.waitForPageLoad();
   }
@@ -68,8 +76,8 @@ export class GithubLoginPage extends BasePage {
   async clickSignInMenu(): Promise<void> {
     // Wait for page to fully load
     //await this.waitForPageLoad();
-    // Use BasePage's fillInput method
-    await this.clickElement(this.signInButton);
+    // Use BasePage's click method
+    await this.click(this.signInButton);
   }
 
   /**
@@ -80,8 +88,8 @@ export class GithubLoginPage extends BasePage {
    * @param username - Username text to enter
    */
   async enterUsername(username: string): Promise<void> {
-    // Use BasePage's fillInput method
-    await this.fillInput(this.usernameInput, username);
+    // Use BasePage's fill method
+    await this.fill(this.usernameInput, username);
   }
 
   /**
@@ -92,7 +100,7 @@ export class GithubLoginPage extends BasePage {
    * @param password - Password text to enter
    */
   async enterPassword(password: string): Promise<void> {
-    await this.fillInput(this.passwordInput, password);
+    await this.fill(this.passwordInput, password);
   }
 
   /**
@@ -101,8 +109,8 @@ export class GithubLoginPage extends BasePage {
    * Clicks the login/submit button
    */
   async clickSigninButton(): Promise<void> {
-    // Use BasePage's clickElement method
-    await this.clickElement(this.loginButton);
+    // Use BasePage's click method
+    await this.click(this.loginButton);
   }
 
   /**
@@ -133,26 +141,26 @@ export class GithubLoginPage extends BasePage {
    * @returns Error message text
    */
   async getErrorMessage(): Promise<string> {
-  // Use Locator to access the alert div
-  const alertDiv = this.errorMessage;
+    // Use selector to access the alert div
+    const alertDiv = (await this.getBrowserManager())?.getPage().locator(this.errorMessage);
 
-  // Evaluate JS in the browser context to get only the direct text content (exclude child nodes)
-  const text = await alertDiv.evaluate((el) => {
-    let result = '';
-    // Convert NodeList to an array so we can iterate in TypeScript environments
-    for (const node of Array.from(el.childNodes)) {
-      // 3 === Node.TEXT_NODE, using numeric constant avoids TS "Cannot find name 'Node'" error
-      //if (node.nodeType === 3) {
-      if (node.nodeType === Node.TEXT_NODE) {
-        // '?' means optional chaining - only access textContent if node is not null/undefined
-        result += node.textContent?.trim() || '';
+    // Evaluate JS in the browser context to get only the direct text content (exclude child nodes)
+    const text = await alertDiv?.evaluate((el) => {
+      let result = '';
+      // Convert NodeList to an array so we can iterate in TypeScript environments
+      for (const node of Array.from(el.childNodes)) {
+        // 3 === Node.TEXT_NODE, using numeric constant avoids TS "Cannot find name 'Node'" error
+        //if (node.nodeType === 3) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          // '?' means optional chaining - only access textContent if node is not null/undefined
+          result += node.textContent?.trim() || '';
+        }
       }
-    }
-    return result;
-  });
+      return result;
+    });
 
-  return text;
-}
+    return text || '';
+  }
 
   // async getErrorMessage(): Promise<string> {
   //   return await this.getText(this.errorMessage);
@@ -166,6 +174,23 @@ export class GithubLoginPage extends BasePage {
    * @returns true if error is shown, false otherwise
    */
   async isErrorMessageDisplayed(): Promise<boolean> {
-    return await this.isElementVisible(this.errorMessage);
+    return await this.isElementVisibleBySelector(this.errorMessage);
+  }
+
+  async clickDiscordIcon(): Promise<void> {
+    await this.clickAndSwitchToNewTab(this.pwDiscordIcon);
+  }
+
+  async isDiscordHomePageVisible(): Promise<boolean> {
+    await this.waitForElementVisibleBySelector(this.discordSiteHomeIcon);
+    return await this.isElementVisibleBySelector(this.discordSiteHomeIcon);
+  }
+
+  async clickCommunityMenu(): Promise<void> {
+    await this.click(this.communityMenuLink);
+  }
+
+  async getPWWelcomeText(): Promise<string> {
+    return await this.getTextContent(this.pwWelcomeTitle);
   }
 }

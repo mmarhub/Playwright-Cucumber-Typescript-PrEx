@@ -66,6 +66,9 @@ BeforeAll(async function () {
 Before(async function (this: CustomWorld, { pickle }) {
   // Log which scenario is starting (helpful for debugging)
   console.log(`Starting scenario: ${pickle.name}`);
+  
+  // Log the process ID (thread) for parallel execution tracking
+  this.attach(`This scenario runs in Thread ID: ${process.pid}`);
 
   // STEP 1: Launch browser (Chrome/Firefox/Safari based on config)
   await this.browserManager.launchBrowser();
