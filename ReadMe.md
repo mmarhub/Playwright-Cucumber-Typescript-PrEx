@@ -154,15 +154,15 @@ import { BasePage } from './BasePage';
 import { BrowserManager } from '../utils/BrowserManager';
 
 export class ExamplePage extends BasePage {
-  private readonly button: Locator;
+  private readonly button: string;
   
   constructor(browserManager: BrowserManager) {
     super(browserManager);
-    this.button = this.page.locator('#myButton');
+    this.button = '#myButton';
   }
   
   async clickButton(): Promise<void> {
-    await this.clickElement(this.button);
+    await this.click(this.button);
   }
 }
 ```
