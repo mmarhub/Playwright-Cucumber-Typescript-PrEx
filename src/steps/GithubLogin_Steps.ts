@@ -272,3 +272,17 @@ Then('I verify the text {string} is visible on the page',
     expect(actualText).toContain(expectedText);
   });
 
+When('I scroll to the {string} button',
+  async function (this: CustomWorld, buttonText: string) {
+    await this.loginPage.scrollToPlaywrightTrainingButton();
+    const buffer = await this.loginPage.takeScreenshot('highlighted-element');
+    if (buffer) {
+      this.attach(buffer, 'image/png');
+    }
+  });
+
+Then('I verify the {string} button is visible on the page',
+  async function (this: CustomWorld, buttonText: string) {
+    const isVisible = await this.loginPage.isPlaywrightTrainingButtonVisible();
+    expect(isVisible).toBeTruthy();
+  });

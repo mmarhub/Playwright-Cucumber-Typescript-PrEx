@@ -71,3 +71,9 @@ Feature: GitHub User Login Functionality
     And I close the new tab and switch back to the main tab
     When I click the "Community" menu link
     Then I verify the text "Welcome" is visible on the page
+
+  @scroll
+  Scenario: ScrollintoView example
+    Given I open the webpage "https://playwright.dev/"
+    When I scroll to the "Playwright Training" button
+    Then I verify the "Playwright Training" button is visible on the page

@@ -27,6 +27,7 @@ export class GithubLoginPage extends BasePage {
   private readonly discordSiteHomeIcon: string;
   private readonly communityMenuLink: string;
   private readonly pwWelcomeTitle: string;
+  private readonly pwTrainingVideosLink: string;
 
   /**
    * Constructor
@@ -51,6 +52,7 @@ export class GithubLoginPage extends BasePage {
     this.discordSiteHomeIcon = '//header[contains(@class, "wrapperDesktop")]//a[contains(@class, "logoLink")]';
     this.communityMenuLink = '//a[contains(text(), "Community")]';
     this.pwWelcomeTitle = 'article header h1';
+    this.pwTrainingVideosLink = '//li[@class="footer__item"]/a[contains(@href, "training")]';
   }
 
   /**
@@ -192,5 +194,14 @@ export class GithubLoginPage extends BasePage {
 
   async getPWWelcomeText(): Promise<string> {
     return await this.getTextContent(this.pwWelcomeTitle);
+  }
+
+  async scrollToPlaywrightTrainingButton(): Promise<void> {
+    await this.highlightElementCustom(this.pwTrainingVideosLink);
+    await this.scrollToElement(this.pwTrainingVideosLink);
+  }
+
+  async isPlaywrightTrainingButtonVisible(): Promise<boolean> {
+    return await this.isElementVisibleBySelector(this.pwTrainingVideosLink);
   }
 }

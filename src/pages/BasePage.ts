@@ -205,14 +205,15 @@ export abstract class BasePage {
    * Filename format: {name}-{timestamp}.png
    * Example: login-page-1699123456789.png
    */
-  async takeScreenshot(name: string): Promise<void> {
-    await this.page.screenshot({
+  async takeScreenshot(name: string): Promise<Buffer> {
+    const buffer = await this.page.screenshot({
       // Template literal creates unique filename with timestamp
       path: `test-reports/screenshots/${name}-${Date.now()}.png`,
 
       // Capture entire page (not just visible viewport)
-      fullPage: true
+      // fullPage: true
     });
+    return buffer;
   }
 
   // Wait for Element Visible by Locator
@@ -277,4 +278,26 @@ export abstract class BasePage {
   //   // Update the current page reference to the parent tab
   //   this.page = parentPage;
   // }
+
+  // Highlight an element using a Playwright locator
+  async highlightElement(selector: string): Promise<void> {
+    await this.page.locator(selector).highlight();
+  }
+
+  // Highlight an element using custom logic
+  async highlightElementCustom(selector: string, color = '#ff0000') {
+    const element = await this.page.locator(selector).elementHandle();
+    if (element) {
+      await this.page.locator(selector).evaluate(el => {
+        const orig = { b: el.style.border, bg: el.style.background };
+        el.style.border = '4px solid #8B0000';
+        el.style.background = 'rgba(255, 0, 0, 0.05)';
+        setTimeout(() => { el.style.border = orig.b; el.style.background = orig.bg; }, 2000);
+      });
+    }
+  }
+
+  async scrollToElement(selector: string): Promise<void> {
+    await this.page.locator(selector).scrollIntoViewIfNeeded();
+  }
 }
