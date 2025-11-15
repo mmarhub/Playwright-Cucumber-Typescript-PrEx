@@ -17,6 +17,7 @@
 import { Browser, BrowserContext, Page, chromium, firefox, webkit } from '@playwright/test';
 import { config } from '../config/config';
 import { setEnvValue } from './env-utils';
+import { CustomWorld } from './World';
 
 export class BrowserManager {
   // Private properties - only accessible within this class
@@ -24,6 +25,7 @@ export class BrowserManager {
   private browser: Browser | null = null;              // The browser instance
   private context: BrowserContext | null = null;       // Browser context (isolated session)
   private page: Page | null = null;                    // The page/tab instance
+  private scenario: CustomWorld | null = null;         // The scenario context
 
   /**
    * Launch Browser
@@ -35,7 +37,7 @@ export class BrowserManager {
    * - Test cross-browser compatibility
    * - Some bugs only appear in specific browsers
    */
-  async launchBrowser(): Promise<void> {
+  async launchBrowser(sce: CustomWorld): Promise<void> {
     const browserType = config.browser;
 
     // Switch statement selects browser based on config
@@ -66,6 +68,9 @@ export class BrowserManager {
     const browserVersion = await this.browser.version();
     // Save it to .env for later use (e.g., in reports)
     await setEnvValue('RUN_BROWSER_VERSION', browserVersion);
+
+    // Store the scenario variable from CustomWorld for using anywhere in the test
+    this.scenario = sce;
   }
 
   /**
@@ -187,5 +192,20 @@ export class BrowserManager {
       throw new Error('Context not created. Call createContext() first.');
     }
     return this.context;
+  }
+
+  /**
+   * Get Scenario Context
+   * 
+   * Returns the current running scenario context
+   * Throws error if context hasn't been created yet
+   * 
+   * @returns The scenario context for test interactions
+   */
+  getScenario(): CustomWorld {
+    if (!this.scenario) {
+      throw new Error('Scenario context not created.');
+    }
+    return this.scenario;
   }
 }

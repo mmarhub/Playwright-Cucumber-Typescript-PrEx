@@ -19,6 +19,9 @@
 import { Page, Locator } from '@playwright/test';
 import { config } from '../config/config';
 import { BrowserManager } from '../utils/BrowserManager';
+import * as fs from 'fs';
+import * as path from 'path';
+import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs'
 
 export abstract class BasePage {
   // Protected properties: accessible in this class and child classes
@@ -43,6 +46,14 @@ export abstract class BasePage {
 
   async getBrowserManager(): Promise<BrowserManager | undefined> {
     return this.browserManager;
+  }
+
+  async scenarioLog(message: string = ''): Promise<void> {
+    this.browserManager?.getScenario()?.attach(
+      `"🔹 " ${message} 
+      - A message from Thread ID: ${process.pid}.`,
+      "text/plain",
+    );
   }
 
   /**
@@ -299,5 +310,107 @@ export abstract class BasePage {
 
   async scrollToElement(selector: string): Promise<void> {
     await this.page.locator(selector).scrollIntoViewIfNeeded();
+  }
+
+  async downloadAndValidate(locator: string, expectedContent: string): Promise<boolean> {
+    try {
+      const downloadDir = path.resolve(
+        process.cwd(),
+        'src',
+        'downloadedFiles'
+      );
+
+      if (!fs.existsSync(downloadDir)) {
+        fs.mkdirSync(downloadDir, { recursive: true });
+      }
+
+      // Trigger the download
+      const [download] = await Promise.all([
+        this.page.waitForEvent('download'),
+        this.page.locator(locator).click(),
+      ]);
+
+      // Determine final filename
+      let suggested = download.suggestedFilename();
+      if (!suggested) {
+        suggested = `downloaded-file-${Date.now()}`;
+      }
+
+      const targetPath = path.resolve(downloadDir, suggested);
+
+      // Remove any previous file with the same name
+      if (fs.existsSync(targetPath)) {
+        fs.unlinkSync(targetPath);
+      }
+
+      // Save the download
+      await download.saveAs(targetPath);
+
+      // Verify the file really exists and is not empty
+      const exists = fs.existsSync(targetPath) && fs.statSync(targetPath).size > 0;
+      if (!exists) {
+        this.scenarioLog(`Download completed but file not found or empty: ${targetPath}`);
+        return false;
+      }
+
+      // Validate PDF content
+      const validated = await this.validateContentInsidePDFFile(suggested, expectedContent);
+      if (!validated) {
+        this.scenarioLog(`Downloaded file found but content validation failed for: ${suggested}`);
+      } else {
+        this.scenarioLog(`Download and validation succeeded for file: ${suggested}`);
+      }
+
+      return exists && validated;
+    } catch (e: any) {
+      this.scenarioLog(`Download and validation failed due to exception: ${e.message}`);
+      return false;
+    }
+  }
+
+  async validateContentInsidePDFFile(fileName: string, expectedContent: string): Promise<boolean> {
+    const downloadDir = path.resolve(
+      process.cwd(),
+      'src',
+      'downloadedFiles'
+    );
+    const filePath = path.resolve(downloadDir, fileName);
+
+    if (!fs.existsSync(filePath)) {
+      this.scenarioLog(`File not found for validation: ${filePath}`);
+      return false;
+    }
+
+    if (!expectedContent?.trim()) {
+      this.scenarioLog('No expected content provided for validation');
+      return false;
+    }
+
+    try {
+      // Load the PDF (pdfjs works with Uint8Array)
+      const data = new Uint8Array(fs.readFileSync(filePath));
+      const pdf = await getDocument({ data }).promise;
+
+      let fullText = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        fullText += textContent.items
+          .map((item: any) => item.str)
+          .join(' ');
+      }
+
+      const found = fullText
+        .toLowerCase()
+        .includes(expectedContent.trim().toLowerCase());
+
+      if (!found) {
+        this.scenarioLog(`Expected content not found in file: ${fileName}`);
+      }
+      return found;
+    } catch (e: any) {
+      this.scenarioLog(`Failed to read/validate file: ${e.message}`);
+      return false;
+    }
   }
 }

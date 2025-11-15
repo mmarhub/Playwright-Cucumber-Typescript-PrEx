@@ -199,6 +199,7 @@ export class GithubLoginPage extends BasePage {
   async scrollToPlaywrightTrainingButton(): Promise<void> {
     await this.highlightElementCustom(this.pwTrainingVideosLink);
     await this.scrollToElement(this.pwTrainingVideosLink);
+    this.scenarioLog(`Scrolled and highlighted to the proper element: ${this.pwTrainingVideosLink.toString()}`)
   }
 
   async isPlaywrightTrainingButtonVisible(): Promise<boolean> {

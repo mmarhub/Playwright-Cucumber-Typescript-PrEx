@@ -71,7 +71,7 @@ Before(async function (this: CustomWorld, { pickle }) {
   this.attach(`This scenario runs in Thread ID: ${process.pid}`);
 
   // STEP 1: Launch browser (Chrome/Firefox/Safari based on config)
-  await this.browserManager.launchBrowser();
+  await this.browserManager.launchBrowser(this);
 
   // STEP 2: Create isolated browser context (like incognito mode)
   await this.browserManager.createContext();
