@@ -77,3 +77,13 @@ Feature: GitHub User Login Functionality
     Given I open the webpage "https://playwright.dev/"
     When I scroll to the "Playwright Training" button
     Then I verify the "Playwright Training" button is visible on the page
+
+  @hover
+  Scenario: Testing the hover function
+    Given Open the browser and start "github" application
+    When I hover over the "Enterprise" menu link
+    Then I verify the "Enterprise platform" submenu is displayed
+    When I hover over the "Resources" menu link
+    Then I verify the "DevOps" submenu is displayed
+    When I hover over the Enterprise menu link
+    Then I verify the Enterprise Platform submenu is displayed

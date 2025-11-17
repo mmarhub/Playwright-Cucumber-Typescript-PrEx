@@ -28,6 +28,8 @@ export class GithubLoginPage extends BasePage {
   private readonly communityMenuLink: string;
   private readonly pwWelcomeTitle: string;
   private readonly pwTrainingVideosLink: string;
+  private readonly enterpriseMenuBtn: string;
+  private readonly enterprisePlatformSubMenu: string;
 
   /**
    * Constructor
@@ -53,6 +55,8 @@ export class GithubLoginPage extends BasePage {
     this.communityMenuLink = '//a[contains(text(), "Community")]';
     this.pwWelcomeTitle = 'article header h1';
     this.pwTrainingVideosLink = '//li[@class="footer__item"]/a[contains(@href, "training")]';
+    this.enterpriseMenuBtn = 'nav[aria-label="Global"] li:has(button:has-text("Enterprise"))';
+    this.enterprisePlatformSubMenu = 'li:has(button:has-text("Enterprise")) a:has-text("Enterprise platform")';
   }
 
   /**
@@ -204,5 +208,27 @@ export class GithubLoginPage extends BasePage {
 
   async isPlaywrightTrainingButtonVisible(): Promise<boolean> {
     return await this.isElementVisibleBySelector(this.pwTrainingVideosLink);
+  }
+
+  async hoverOverElement(menuName: string): Promise<void> {
+    const xpath = `//button[contains(text(), '${menuName}')]`;
+    const menuLocator = (await this.getBrowserManager())?.getPage().locator(xpath);
+    await this.hoverElement(menuLocator!);
+  }
+
+  async isSubMenuVisible(menu: string, subMenu: string): Promise<boolean> {
+    //const xpath = `//nav[@aria-label='Global']//li[button[normalize-space()='${menu}']]//a[contains(., '${subMenu}')]`;
+    const css = `nav[aria-label="Global"] li:has(button:has-text("${menu}")) a:has-text("${subMenu}")`;
+    await this.waitForElementVisibleBySelector(css);
+    return this.isElementVisibleBySelector(css);
+  }
+
+  async hoverOverEnterpriseMenu(): Promise<void> {
+    await this.hoverElement(this.enterpriseMenuBtn);
+  }
+
+  async isEnterprisePlatformSubMenuVisible(): Promise<boolean> {
+    await this.waitForElementVisibleBySelector(this.enterprisePlatformSubMenu);
+    return this.isElementVisibleBySelector(this.enterprisePlatformSubMenu);
   }
 }

@@ -17,6 +17,7 @@
  */
 
 import { Page, Locator } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { config } from '../config/config';
 import { BrowserManager } from '../utils/BrowserManager';
 import * as fs from 'fs';
@@ -229,12 +230,15 @@ export abstract class BasePage {
 
   // Wait for Element Visible by Locator
   async waitForElementVisibleByLocator(locator: Locator, timeout: number = 10000): Promise<void> {
-    await locator.waitFor({ state: 'visible', timeout: timeout });
+    //await locator.waitFor({ state: 'visible', timeout: timeout });
+    await expect(locator, `Selector not found: ${locator}`).toBeVisible({ timeout });
   }
 
   // Wait for Element Visible by Selector
   async waitForElementVisibleBySelector(selector: string, timeout: number = 10000): Promise<void> {
-    await this.page.locator(selector).waitFor({ state: 'visible', timeout: timeout });
+    const locator = this.page.locator(selector);
+    // Instead of using loc.waitFor, use this expect().toBeVisible() for test effectiveness
+    await expect(locator, `Locator Not Found ${locator}`).toBeVisible({ timeout: timeout });
   }
 
   // Click Element by Selector and Switch to New Tab
@@ -412,5 +416,37 @@ export abstract class BasePage {
       this.scenarioLog(`Failed to read/validate file: ${e.message}`);
       return false;
     }
+  }
+
+  async hoverElement(element: string | Locator): Promise<void> {
+    const locator = typeof element === 'string' ? this.page.locator(element) : element;
+
+    try {
+      await this.waitForElementVisibleByLocator(locator)
+      await locator.hover();
+    } catch (error) {
+      // Enhance error with context
+      const selector = typeof element === 'string' ? element : '[Locator]';
+      throw new Error(
+        `Failed to hover over element: ${selector}\n` +
+        `Reason: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+    // if (typeof element === "string") {
+    //   // case: string CSS/XPath selector
+    //   await this.waitForElementVisibleBySelector(element);
+    //   await this.page.locator(element).hover();
+
+    // } else if (element instanceof this.page.locator('').constructor) {
+    //   // case: Locator object
+    //   await this.waitForElementVisibleByLocator(element);
+    //   await element.hover();
+
+    // } else {
+    //   // TS safeguard (mainly for JS calls)
+    //   throw new Error(
+    //     `Element must be a string selector or Locator instance, but got: ${typeof element}`
+    //   );
+    // }
   }
 }

@@ -17,9 +17,14 @@
  * - Keep steps focused on WHAT to do, not HOW to do it
  */
 
-import { Given, When, Then } from '@cucumber/cucumber';
-import { expect } from '@playwright/test';
+import { Given, When, Then, setDefaultTimeout } from '@cucumber/cucumber';
+import { expect } from "chai";
 import { CustomWorld } from '../utils/World';
+
+// cucumber timeout issue: similar to selenium wait until 30 seconds
+setDefaultTimeout(60 * 1000);
+
+let insVarMenuLink: string;
 
 /**
  * GIVEN STEPS
@@ -177,7 +182,7 @@ Then('the user should see the home page', async function (this: CustomWorld) {
 
   // Assert that user is logged in
   // If isLoggedIn is false, test fails with assertion error
-  expect(isLoggedIn).toBeTruthy();
+  expect(isLoggedIn).to.be.true;
 });
 
 /**
@@ -192,7 +197,7 @@ Then('the user should see an error message', async function (this: CustomWorld) 
   const isErrorDisplayed = await this.loginPage.isErrorMessageDisplayed();
 
   // Assert that error is displayed
-  expect(isErrorDisplayed).toBeTruthy();
+  expect(isErrorDisplayed).to.be.true;
 });
 
 /**
@@ -215,7 +220,7 @@ Then('the error message should contain {string}',
     // Example: errorMessage = "Error: Invalid credentials"
     //          expectedMessage = "Invalid"
     //          Test passes!
-    expect(errorMessage).toContain(expectedMessage);
+    expect(errorMessage).to.equal(expectedMessage);
   });
 
 /**
@@ -238,7 +243,7 @@ Then('I should see error message {string}',
     // Example: errorMessage = "Error: Invalid credentials"
     //          expectedMessage = "Invalid"
     //          Test passes!
-    expect(errorMessage).toContain(expectedMessage);
+    expect(errorMessage).to.equal(expectedMessage);
   });
 
 Given('I open the webpage {string}',
@@ -253,7 +258,7 @@ When('I click the Discord icon and navigate to the new tab',
 
 When('I verify the title contains {string}',
   async function (this: CustomWorld, expectedTitle: string) {
-    expect(await this.loginPage.isDiscordHomePageVisible()).toBeTruthy();
+    expect(await this.loginPage.isDiscordHomePageVisible()).to.be.true;
   });
 
 When('I close the new tab and switch back to the main tab',
@@ -269,7 +274,7 @@ When('I click the {string} menu link',
 Then('I verify the text {string} is visible on the page',
   async function (this: CustomWorld, expectedText: string) {
     const actualText = await this.loginPage.getPWWelcomeText();
-    expect(actualText).toContain(expectedText);
+    expect(actualText).to.equal(expectedText);
   });
 
 When('I scroll to the {string} button',
@@ -284,5 +289,32 @@ When('I scroll to the {string} button',
 Then('I verify the {string} button is visible on the page',
   async function (this: CustomWorld, buttonText: string) {
     const isVisible = await this.loginPage.isPlaywrightTrainingButtonVisible();
-    expect(isVisible).toBeTruthy();
+    expect(isVisible).to.be.true;
+  });
+
+When('I hover over the {string} menu link',
+  async function (this: CustomWorld, menuName: string) {
+    insVarMenuLink = menuName;
+    await this.loginPage.hoverOverElement(menuName);
+  });
+
+Then('I verify the {string} submenu is displayed',
+  async function (this: CustomWorld, subMenuName: string) {
+    expect(
+      await this.loginPage.isSubMenuVisible(insVarMenuLink, subMenuName),
+      `Submenu '${subMenuName}' is not visible.`
+    ).to.be.true;
+  });
+
+When('I hover over the Enterprise menu link',
+  async function (this: CustomWorld) {
+    this.loginPage.hoverOverEnterpriseMenu();
+  });
+
+Then('I verify the Enterprise Platform submenu is displayed',
+  async function (this: CustomWorld) {
+    expect(
+      await this.loginPage.isEnterprisePlatformSubMenuVisible(),
+      `Enterprise Platform submenu is not visible.`
+    ).to.be.true;
   });

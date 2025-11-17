@@ -24,7 +24,9 @@
     "multiple-cucumber-html-reporter": "^3.9.3"
   },
   "devDependencies": {
+    "@types/chai": "^5.2.3",
     "@types/node": "^24.10.0",
+    "chai": "^6.2.1",
     "pdfjs-dist": "^5.4.394",
     "rimraf": "^6.1.0",
     "strip-ansi": "^7.1.2",
