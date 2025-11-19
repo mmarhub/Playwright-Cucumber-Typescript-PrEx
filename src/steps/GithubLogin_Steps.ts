@@ -17,12 +17,9 @@
  * - Keep steps focused on WHAT to do, not HOW to do it
  */
 
-import { Given, When, Then, setDefaultTimeout } from '@cucumber/cucumber';
+import { Given, When, Then } from '@cucumber/cucumber';
 import { expect } from "chai";
 import { CustomWorld } from '../utils/World';
-
-// cucumber timeout issue: similar to selenium wait until 30 seconds
-setDefaultTimeout(60 * 1000);
 
 let insVarMenuLink: string;
 

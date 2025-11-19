@@ -16,7 +16,7 @@
  * - Thread-safe parallel execution
  */
 
-import { World, IWorldOptions, setWorldConstructor } from '@cucumber/cucumber';
+import { World, IWorldOptions, setWorldConstructor, setDefaultTimeout } from '@cucumber/cucumber';
 import { BrowserManager } from './BrowserManager';
 import { Page } from '@playwright/test';
 import { GithubLoginPage } from '../pages/GithubLoginPage';
@@ -36,6 +36,14 @@ export interface ICustomWorld extends World {
   loginPage: GithubLoginPage;           // Login page object (lazy-loaded)
   homePage: GithubHomePage;             // Home page object (lazy-loaded)
 }
+
+/**
+ * By default, asynchronous hooks and steps timeout after 5000 milliseconds. 
+ * This can be modified globally with: setDefaultTimeout(60 * 1000).
+ * 
+ * Error: function timed out, ensure the promise resolves within 5000 milliseconds
+ */
+setDefaultTimeout(60 * 1000);
 
 /**
  * CustomWorld Class
