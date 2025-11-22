@@ -231,4 +231,26 @@ export class GithubLoginPage extends BasePage {
     await this.waitForElementVisibleBySelector(this.enterprisePlatformSubMenu);
     return this.isElementVisibleBySelector(this.enterprisePlatformSubMenu);
   }
+
+  async performKeyboardActionsOnLoginFields(): Promise<void> {
+    const page = (await this.getBrowserManager())?.getPage();
+
+    // Focus on username input
+    await this.click(this.usernameInput);
+
+    // check the os is Mac or Windows/Linux for paste shortcuts
+    const isMac = process.platform === 'darwin';
+    if (isMac) {
+      // use Meta key for Mac
+      await page?.keyboard.press('Meta+A'); // Select all (Cmd + A)
+      await page?.keyboard.press('Delete'); // Delete
+    } else {
+      // use Control key for Windows/Linux
+      await page?.keyboard.press('Control+A'); // Select all (Ctrl + A)
+      await page?.keyboard.press('Delete'); // Delete
+    }
+
+    // type random username
+    await this.fill(this.usernameInput, "manual playwright_user");
+  }
 }

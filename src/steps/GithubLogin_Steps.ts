@@ -315,3 +315,8 @@ Then('I verify the Enterprise Platform submenu is displayed',
       `Enterprise Platform submenu is not visible.`
     ).to.be.true;
   });
+
+Then('I perform keyboard actions to select all, cut, and paste the username into the password field',
+  async function (this: CustomWorld) {
+    await this.loginPage.performKeyboardActionsOnLoginFields();
+  });

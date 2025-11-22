@@ -87,3 +87,13 @@ Feature: GitHub User Login Functionality
     Then I verify the "DevOps" submenu is displayed
     When I hover over the Enterprise menu link
     Then I verify the Enterprise Platform submenu is displayed
+
+  # This scenario can be seen clearly when executed with 'slowMo=1000'
+  @keyActions
+  Scenario: Keyboard actions example
+    Given Open the browser and start "github" application
+    When I click on Sign in link
+    And I enter username "positive@test.com"
+    And I enter password "password123"
+    And I perform keyboard actions to select all, cut, and paste the username into the password field
+

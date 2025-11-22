@@ -26,6 +26,21 @@ const browserName = process.env.BROWSER || 'chromium';
 
 const nodeVersion = process.version;
 
+const start = process.env.TEST_STARTED_TIME || new Date().toLocaleString();
+const end = process.env.TEST_COMPLETED_TIME || new Date().toLocaleString();
+
+// Calculate total execution time of the test run
+const startTime = new Date(start);
+const endTime = new Date(end);
+const totalExecutionTimeMs = endTime - startTime;
+const totalExecutionTimeSec = Math.floor(totalExecutionTimeMs / 1000);
+const totalExecutionTimeMin = Math.floor(totalExecutionTimeSec / 60);
+let totalExecutionTimeHours = 0;
+if (totalExecutionTimeMin >= 60) {
+  totalExecutionTimeHours = Math.floor(totalExecutionTimeMin / 60);
+}
+const totalExecutionTime = `${totalExecutionTimeHours} hr ${totalExecutionTimeMin % 60} min ${totalExecutionTimeSec % 60} sec`;
+
 /**
  * Generate HTML Report
  * 
@@ -64,7 +79,8 @@ report.generate({
       { label: 'Project', value: 'Playwright Cucumber Framework' },
       { label: 'Release', value: '1.0.0' },
       { label: 'Execution Start Time', value: process.env.TEST_STARTED_TIME || new Date().toLocaleString() },
-      { label: 'Execution Completed Time', value: process.env.TEST_COMPLETED_TIME || new Date().toLocaleString() }
+      { label: 'Execution Completed Time', value: process.env.TEST_COMPLETED_TIME || new Date().toLocaleString() },
+      { label: 'Total Execution Time', value: totalExecutionTime }
     ]
   }
 });
