@@ -18,7 +18,7 @@
  */
 
 import { Given, When, Then } from '@cucumber/cucumber';
-import { expect } from '@playwright/test';
+import { expect } from 'chai';
 import { CustomWorld } from '../utils/World';
 
 /**
@@ -61,7 +61,9 @@ Then('I should see the pricing page with title {string}', async function (this: 
   const title = await this.homePage.getPricingTitle();
   this.attachClean(`Pricing page title: ${title}`, 'text/plain');
   // Assert the title matches the expected title
-  expect(title).toBe(expectedTitle);
+  expect(title).to.equal(expectedTitle);
+  // access appName from testData stored during login step
+  this.attachClean(`Application Name from test data: ${this.testData.get('AppName')}`);
 });
 
 

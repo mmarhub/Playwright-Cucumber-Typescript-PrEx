@@ -55,6 +55,8 @@ Given('Open the browser and start {string} application', async function (this: C
   // Call navigate method to open home page
   await this.loginPage.navigate();
   this.attachClean(`Opened the browser and started the ${appName} application`, 'text/plain');
+  // Store appName in testData (similar to per scenario storage) for later use
+  this.testData.set('AppName', appName);
 });
 
 /*

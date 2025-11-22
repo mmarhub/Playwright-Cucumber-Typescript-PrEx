@@ -136,7 +136,7 @@ After(async function (this: CustomWorld, { pickle, result }) {
 
     // Take screenshot as buffer (binary data)
     const screenshot = await this.page.screenshot({
-      fullPage: true,
+      //fullPage: true,
       type: 'png'
     });
 

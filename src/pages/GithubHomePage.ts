@@ -27,8 +27,8 @@ export class GithubHomePage extends BasePage {
     super(browserManager);
     
     // Initialize selectors for home pricing elements
-    this.pricingLink = '//nav[@aria-label="Global"]//span[contains(text(),"Pricing")]';
-    this.pricingTitle = '//h1[@class="h2-mktg"]';
+    this.pricingLink = 'li.HeaderMenu-item a.HeaderMenu-link[href="https://github.com/pricing"]';
+    this.pricingTitle = 'h1.h2-mktg';
     this.welcomeMessage = '//div[contains(@class, "welcome-message")]';
     this.logoutButton = '//summary[@aria-label="View profile and more"]';
     this.userProfile = '//img[@alt="@username"]'; // Example user profile image locator
