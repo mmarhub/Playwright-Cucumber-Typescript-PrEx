@@ -215,9 +215,93 @@ const screenshot = await this.page.screenshot();
 await this.attach(screenshot, 'image/png');
 ```
 
+## 🌐 API Automation Suite
+
+This framework also includes an **API automation suite** that runs alongside the web tests. Both suites share the same Cucumber structure, reporting, and can execute independently or together.
+
+### 📍 API Code Structure
+
+```
+src/
+├── config/
+│   └── APIconfig.ts             # API-specific config (URLs, headers, timeouts)
+├── steps/
+│   └── PaypalAPI_Steps.ts       # API step definitions
+├── utils/
+│   ├── RESTUtils.ts             # REST helper (Playwright APIRequestContext wrapper)
+│   └── World.ts                 # Cucumber World with restUtils instance
+├── apiRequests/                 # YAML templates for API request payloads
+│   └── *.yml
+└── apiResponses/                # YAML templates for API response validation
+    └── *.yml
+```
+
+### 🔑 Key Components
+
+**RESTUtils.ts** — Wrapper around Playwright's `APIRequestContext` that provides:
+- OAuth token retrieval
+- HTTP methods
+- Response helpers
+- Context management
+
+**APIconfig.ts** — Centralized API configuration:
+- Base URLs (OAuth, Transaction)
+- Request headers and timeouts
+- Authentication credentials (read from `.env`)
+
+### 🎯 Running API Tests
+
+```bash
+# Run only API tests
+npm run test:api
+
+# Run API tests with specific tag
+npm run test:tag -- "@api"
+
+# Run API and smoke tests together
+npm run test:tag -- "@api and @smoke"
+
+# Run all tests (web + API)
+npm run test
+
+# Run tests in parallel (3 workers)
+npm run test:parallel
+```
+
+### 📊 API Test Reporting
+
+API tests use the same reporting pipeline as web tests:
+- Attach request/response payloads: `this.attach(JSON.stringify(payload), 'application/json')`
+- Attach raw responses: `this.attach(await response.text(), 'text/plain')`
+- All artifacts appear in the HTML report
+
+```bash
+npm run report    # Generate HTML report after tests
+```
+
+### 🔄 API vs Web Test Tags
+
+The framework automatically detects test type by tag:
+
+```typescript
+// In hooks.ts - Before hook
+const isAPIScenario = pickle.tags.some(tag => tag.name === '@api');
+if (isAPIScenario) {
+  // Skip browser launch for API tests
+  return;
+}
+```
+
+- **@api** tag → API test (no browser needed)
+- **@web** or other tags → Web test (launches browser)
+- Can run both in same suite: `npm run test`
+
+---
+
 ## 📚 Additional Resources
 
 - [Playwright Docs](https://playwright.dev)
+- [Playwright API Testing](https://playwright.dev/docs/api-testing)
 - [Cucumber Docs](https://cucumber.io/docs/cucumber/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 
