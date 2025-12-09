@@ -1,0 +1,29 @@
+---
+
+Scenario1:
+  url: https://example.com/example_webhook
+  event_types:
+  - name: PAYMENT.AUTHORIZATION.CREATED
+  - name: PAYMENT.AUTHORIZATION.VOIDED
+
+Scenario2:
+  url: https://example.com/another_webhook
+  event_types:
+  - name: PAYMENT.CAPTURE.COMPLETED
+  - name: PAYMENT.AUTHORIZATION.VOIDED
+
+Scenario3:
+  url: https://example.com/yet_another_webhook
+  event_types:
+  - name: PAYMENT.SALE.REFUNDED
+  - name: PAYMENT.AUTHORIZATION.CREATED
+
+PATCH_Scenario:
+  - op: replace
+    path: /url
+    value: https://example.com/another_webhook
+  - op: replace
+    path: /event_types
+    value:
+      - name: PAYMENT.CAPTURE.COMPLETED
+

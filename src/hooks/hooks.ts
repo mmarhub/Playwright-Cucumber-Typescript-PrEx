@@ -66,9 +66,16 @@ BeforeAll(async function () {
 Before(async function (this: CustomWorld, { pickle }) {
   // Log which scenario is starting (helpful for debugging)
   console.log(`Starting scenario: ${pickle.name}`);
-  
+
   // Log the process ID (thread) for parallel execution tracking
   this.attach(`This scenario runs in Thread ID: ${process.pid}`);
+
+  // I want to implement the logic like, if it is API scenario, then skip browser launch
+  const isAPIScenario = pickle.tags.some(tag => tag.name === '@api');
+  if (isAPIScenario) {
+    this.attach('API scenario detected - skipping browser launch.');
+    return; // Skip browser setup for API scenarios
+  }
 
   // STEP 1: Launch browser (Chrome/Firefox/Safari based on config)
   await this.browserManager.launchBrowser(this);
@@ -112,9 +119,34 @@ Before(async function (this: CustomWorld, { pickle }) {
  * 2. After hook runs (even if scenario failed)
  * 3. Resources cleaned up
  */
+
+// I want to modify the After hook by distinguishing API and UI scenarios
 After(async function (this: CustomWorld, { pickle, result }) {
   // Log scenario result
   console.log(`Scenario: ${pickle.name} - Status: ${result?.status}`);
+
+  // I want to modify the After hook by distinguishing API and UI scenarios
+  const isAPIScenario = pickle.tags.some(tag => tag.name === '@api');
+  if (isAPIScenario) {
+    this.attach('API scenario detected - skipping browser cleanup.');
+
+    // I want the 'this.testData' content to be logged even for API scenarios
+    if (this.testData.size > 0) {
+      let testDataLog = '\nAll test data stored and used for this scenario:\n';
+      for (const [key, value] of this.testData.entries()) {
+        testDataLog += `- ${key}: ${value}\n`;
+      }
+      this.attach(testDataLog, 'text/plain');
+    }
+
+    // Clear test data for this scenario
+    this.testData.clear();
+
+    // Dispose API context if it was used for the API tests
+    await this.restUtils.disposeAPIContext();
+
+    return; // Skip browser cleanup for API scenarios
+  }
 
   // If scenario failed, take a screenshot for debugging
   if (result?.status === Status.FAILED && this.page) {
@@ -151,8 +183,20 @@ After(async function (this: CustomWorld, { pickle, result }) {
   // Without this, you'll have memory leaks and hanging browser processes
   await this.browserManager.closeBrowser();
 
+  // If 'this.testData' was used to store scenario-specific test data, print it in report
+  if (this.testData.size > 0) {
+    let testDataLog = '\nAll test data stored and used for this scenario:\n';
+    for (const [key, value] of this.testData.entries()) {
+      testDataLog += `- ${key}: ${value}\n`;
+    }
+    this.attach(testDataLog, 'text/plain');
+  }
+
   // Clear test data for this scenario
   this.testData.clear();
+
+  // Dispose API context if it was used for the API tests
+  await this.restUtils.disposeAPIContext();
 });
 
 /**

@@ -14,6 +14,7 @@
     "test:login": "npm run clean && cucumber-js --tags @login",
     "test:pricing": "npm run clean && cucumber-js --tags @pricing",
     "test:tag": "npm run clean && cucumber-js --tags",
+    "test:api": "npm run clean && cucumber-js --tags @api",
     "report": "node src/reports/generate-report.js",
     "test": "npm run suite; npm run report"
   },
@@ -21,10 +22,14 @@
     "@cucumber/cucumber": "^12.2.0",
     "@playwright/test": "^1.56.1",
     "dotenv": "^17.2.3",
+    "js-yaml": "^4.1.1",
+    "jsonpath-plus": "^10.3.0",
     "multiple-cucumber-html-reporter": "^3.9.3"
   },
   "devDependencies": {
     "@types/chai": "^5.2.3",
+    "@types/js-yaml": "^4.0.9",
+    "@types/jsonpath-plus": "^5.0.5",
     "@types/node": "^24.10.0",
     "chai": "^6.2.1",
     "pdfjs-dist": "^5.4.394",

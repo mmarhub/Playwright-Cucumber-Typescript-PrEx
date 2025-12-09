@@ -22,6 +22,7 @@ import { Page } from '@playwright/test';
 import { GithubLoginPage } from '../pages/GithubLoginPage';
 import { GithubHomePage } from '../pages/GithubHomePage';
 import stripAnsi from 'strip-ansi';
+import { RESTUtils } from './RESTUtils';
 
 /**
  * CustomWorld Interface
@@ -35,6 +36,9 @@ export interface ICustomWorld extends World {
   testData: Map<string, any>;           // Store scenario-specific test data
   loginPage: GithubLoginPage;           // Login page object (lazy-loaded)
   homePage: GithubHomePage;             // Home page object (lazy-loaded)
+
+  // For API Testing
+  restUtils: RESTUtils;                 // REST API utility instance
 }
 
 /**
@@ -62,6 +66,9 @@ export class CustomWorld extends World implements ICustomWorld {
   // ? means optional (may be undefined initially)
   private _loginPage?: GithubLoginPage;
   private _homePage?: GithubHomePage;
+
+  // For API Testing
+  private _restUtils?: RESTUtils;
 
   /**
    * Constructor
@@ -141,6 +148,14 @@ export class CustomWorld extends World implements ICustomWorld {
       this._homePage = new GithubHomePage(this.browserManager!);
     }
     return this._homePage;
+  }
+
+  // For API Testing
+  get restUtils(): RESTUtils {
+    if (!this._restUtils) {
+      this._restUtils = new RESTUtils();
+    }
+    return this._restUtils;
   }
 }
 
