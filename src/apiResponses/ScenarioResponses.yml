@@ -1,0 +1,9 @@
+---
+
+Scenario4:
+  name: WEBHOOK_URL_ALREADY_EXISTS
+  message: Webhook URL already exists
+  debug_id: f77487833a933
+  information_link: https://developer.paypal.com/docs/api/webhooks/#errors
+  details: []
+  links: []

@@ -89,9 +89,10 @@ export class RESTUtils {
       data: this.apiBodyPayload,
     });
 
-    if (!this.response.ok()) {
-      throw new Error(`Transaction API POST request failed: ${this.response.status()} - ${this.response.statusText()}`);
-    }
+    // commenting the below line to allow negative test cases
+    // if (!this.response.ok()) {
+    //   throw new Error(`Transaction API POST request failed: ${this.response.status()} - ${this.response.statusText()}`);
+    // }
 
     return this.response;
   }
@@ -102,9 +103,10 @@ export class RESTUtils {
       headers: this.apiCustomHeaders,
     });
 
-    if (!this.response.ok()) {
-      throw new Error(`Transaction API GET request failed: ${this.response.status()} - ${this.response.statusText()}`);
-    }
+    // commenting the below line to allow negative test cases
+    // if (!this.response.ok()) {
+    //   throw new Error(`Transaction API GET request failed: ${this.response.status()} - ${this.response.statusText()}`);
+    // }
 
     return this.response;
   }
@@ -116,9 +118,10 @@ export class RESTUtils {
       data: this.apiBodyPayload,
     });
 
-    if (!this.response.ok()) {
-      throw new Error(`Transaction API PUT request failed: ${this.response.status()} - ${this.response.statusText()}`);
-    }
+    // commenting the below line to allow negative test cases
+    // if (!this.response.ok()) {
+    //   throw new Error(`Transaction API PUT request failed: ${this.response.status()} - ${this.response.statusText()}`);
+    // }
 
     return this.response;
   }
@@ -130,9 +133,10 @@ export class RESTUtils {
       data: this.apiBodyPayload,
     });
 
-    if (!this.response.ok()) {
-      throw new Error(`Transaction API PATCH request failed: ${this.response.status()} - ${this.response.statusText()}`);
-    }
+    // commenting the below line to allow negative test cases
+    // if (!this.response.ok()) {
+    //   throw new Error(`Transaction API PATCH request failed: ${this.response.status()} - ${this.response.statusText()}`);
+    // }
 
     return this.response;
   }

@@ -76,3 +76,23 @@ Feature: Paypals Webhooks Basic Functionality
     Then I form a client by manipulating the resource url with "/v1/notifications/webhooks/{webhookId}"
     Then I make a "DELETE" call with OAuth token and capture the response
     Then I should receive the HTTP status code in response as 204
+
+  @api
+  Scenario: Create a Webhook with an already existing URL to verify the error response
+    Given I generate OAuth token with resource "/v1/oauth2/token"
+    Then I form a client with this resource url "/v1/notifications/webhooks"
+    Then I get the "request" content from "ScenarioRequests" file for the scenario "Scenario3"
+    Then I make a "POST" call with OAuth token and capture the response
+    Then I should receive the HTTP status code in response as 201
+    Then I extract value from response using json path "$['id']" and store as "webhookId"
+    Then I form a client by manipulating the resource url with "/v1/notifications/webhooks/{webhookId}"
+    Then I make a "GET" call with OAuth token and capture the response
+    Then I should receive the HTTP status code in response as 200
+    Then I form a client with this resource url "/v1/notifications/webhooks"
+    Then I make a "POST" call with OAuth token and capture the response
+    Then I should receive the HTTP status code in response as 400
+    And I get the "response" content from "ScenarioResponses" file for the scenario "Scenario4"
+    Then I validate the actual output response with expected api response
+    And I form a client by manipulating the resource url with "/v1/notifications/webhooks/{webhookId}"
+    Then I make a "DELETE" call with OAuth token and capture the response
+    Then I should receive the HTTP status code in response as 204

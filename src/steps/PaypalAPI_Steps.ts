@@ -1,10 +1,14 @@
 import { Given, When, Then, DataTable } from "@cucumber/cucumber";
-import { expect } from "chai";
+import { expect, use } from "chai";
 import { CustomWorld } from "../utils/World";
 import { APIResponse } from "@playwright/test";
 import { promises as fs } from 'fs';
 import yaml from 'js-yaml';
 import { JSONPath } from 'jsonpath-plus';
+import chaiExclude from 'chai-exclude';
+
+// Extend Chai with chai-exclude for deep equality checks ignoring specific fields
+use(chaiExclude);
 
 Given('I generate OAuth token with resource {string}', async function (this: CustomWorld, resource: string) {
   // Setup OAuth API request context and resource URL
@@ -171,14 +175,14 @@ Then('I make a {string} call with OAuth token and capture the response', async f
 
   // Create one more custom logic for DELETE method to not expect any response body
   if (method.toUpperCase() === 'DELETE') {
-    this.testData.set('responseObject', null);
+    this.testData.set('actualResponseObject', null);
     this.attach(`API Response Status: ${response.status()}\nNo response body for DELETE method.`);
     return;
   }
 
   // Store the response object in test data for further validation
   const responseBody = await response.json();
-  this.testData.set('responseObject', responseBody);
+  this.testData.set('actualResponseObject', responseBody);
 
   // Attach the response status and body for visibility
   const responseJson = JSON.stringify(responseBody, null, 2);
@@ -192,7 +196,7 @@ Then('I should receive the HTTP status code in response as {int}', async functio
 });
 
 Then('I extract value from response using json path {string} and store as {string}', async function (this: CustomWorld, jsonPath: string, storeKey: string) {
-  const responseObject = this.testData.get('responseObject');
+  const responseObject = this.testData.get('actualResponseObject');
   if (!responseObject) {
     throw new Error('Response object not found in test data. Ensure that the response is available before extracting values.');
   }
@@ -208,7 +212,7 @@ Then('I extract value from response using json path {string} and store as {strin
 });
 
 Then('I form a JsonPath and verify the output object with ExpectedObject:', async function (this: CustomWorld, dataTable: DataTable) {
-  const responseObject = this.testData.get('responseObject');
+  const responseObject = this.testData.get('actualResponseObject');
   if (!responseObject) {
     throw new Error('Response object not found in test data. Ensure that the response is available before verification.');
   }
@@ -243,6 +247,31 @@ Then('I form a client by manipulating the resource url with {string}', async fun
   await this.restUtils.setupTranResourceURL(manipulatedUrl);
   await this.restUtils.setupTranRequest();
   this.attach(`Formed client with manipulated resource URL: ${manipulatedUrl}.`);
+});
+
+Then('I validate the actual output response with expected api response', async function (this: CustomWorld) {
+  const actualResponseObject = this.testData.get('actualResponseObject');
+  if (!actualResponseObject) {
+    throw new Error('Response object not found in test data. Ensure that the response is available before validation.');
+  }
+  this.attach(`Actual Response Object:\n${JSON.stringify(actualResponseObject, null, 2)}`);
+
+  const expectedResponseObject = this.testData.get('responseObject');
+  if (!expectedResponseObject) {
+    throw new Error('Expected response object not found in test data. Ensure that the expected response is available before validation.');
+  }
+  this.attach(`Expected Response Object:\n${JSON.stringify(expectedResponseObject, null, 2)}`);
+
+  // This deep equality check ensures that all properties and nested properties match, but ignores the order of properties.
+  expect(actualResponseObject)
+    .excluding(['debug_id']) // Exclude dynamic fields, but works for Top-level only
+    .to.eql(expectedResponseObject);
+
+  // This strict equality check ensures that all properties and nested properties match exactly, including the order of properties.
+  // expect(actualResponseObject)
+  //   .excluding(['debug_id']) // Exclude dynamic fields, but works for Top-level only
+  //   .to.deep.equal(expectedResponseObject);
+  this.attach(`Validated the actual response with expected response.`);
 });
 
 /**
